@@ -15,26 +15,44 @@ def simulation(numRuns: int):
     
     return df
 
-def displaySimulation(numRuns: int):
+def find_simulation_averages(numRuns: int):
     data = simulation(numRuns)
-    data_avg = data.expanding().mean()
+    return ((data['P1'].sum() / numRuns), 
+            (data['P2'].sum() / numRuns), 
+            (data['P3'].sum() / numRuns))    
+
+def CLTsimulation(numRuns: int, numAvgs: int):
+    df = pd.DataFrame(columns=['P1', 'P2', 'P3'])
+    for _ in range(numAvgs):
+        x = find_simulation_averages(numRuns)
+        new_row = pd.DataFrame([[x[0], x[1], x[2]]], columns=['P1', 'P2', 'P3'])
+        df = pd.concat([df, new_row], ignore_index=True)
     
-    plt.figure(figsize=(10,6))
-    plt.plot(data_avg.index, data_avg['P1'], marker='.', label='P1')
-    plt.plot(data_avg.index, data_avg['P2'], marker='.', label='P2')
-    plt.plot(data_avg.index, data_avg['P3'], marker='.', label='P3')
+    return df
 
-    plt.ylim(0,10)
+# wip trying to create bargraph or histogram ig for the CLT simulation
 
-    plt.xlabel('Index')
-    plt.ylabel('Expanding Average')
-    plt.title(f'Expanding Average of P1, P2, P3')
-    plt.legend()
+def display_simulation(type: str, numRuns: int, numAvgs: int):
+    
+    if(type == 'simulation'):
+        data = simulation(numRuns)
+        data_avg = data.expanding().mean()
+        
+        plt.figure(figsize=(10,6))
+        plt.plot(data_avg.index, data_avg['P1'], marker='.', label='P1')
+        plt.plot(data_avg.index, data_avg['P2'], marker='.', label='P2')
+        plt.plot(data_avg.index, data_avg['P3'], marker='.', label='P3')
 
-    plt.show()
+        plt.ylim(0,10)
 
-displaySimulation(100)
+        plt.xlabel('Index')
+        plt.ylabel('Expanding Average')
+        plt.title('Expanding Average of P1, P2, P3')
+        plt.legend()
 
-# not finished yet
-def CLTsimulation(numRuns: int):
-    print()
+        plt.show()
+    
+    else:
+        print()
+
+display_simulation('CLT', 100, 10)
